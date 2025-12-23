@@ -43,9 +43,8 @@ public class ExpensesFragment extends Fragment implements TransactionAdapter.OnT
         
         databaseHelper = new DatabaseHelper(getContext());
         
-        // Note: Update the IDs in fragment_expenses.xml to match these
-        expensesRecyclerView = view.findViewById(R.id.incomeRecyclerView); // Will be fixed in XML
-        addExpenseFab = view.findViewById(R.id.addIncomeFab); // Will be fixed in XML
+        expensesRecyclerView = view.findViewById(R.id.expensesRecyclerView);
+        addExpenseFab = view.findViewById(R.id.addExpenseFab);
         
         setupRecyclerView();
         loadExpenses();
