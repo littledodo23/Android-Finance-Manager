@@ -1,177 +1,173 @@
 package com.finance.manager;
 
-import android.graphics.Color;
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.*;
-import com.github.mikephil.charting.utils.ColorTemplate;
-import java.text.NumberFormat;
-import java.util.*;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
-public class HomeFragment extends Fragment {
-    
-    private Spinner periodSpinner;
-    private TextView totalIncomeText, totalExpensesText, balanceText;
-    private PieChart pieChart;
-    private BarChart categoryBarChart;
-    
+public class IncomeFragment extends Fragment implements TransactionAdapter.OnTransactionClickListener {
+
+    private RecyclerView incomeRecyclerView;
+    private FloatingActionButton addIncomeFab;
+    private TransactionAdapter adapter;
+
     private DatabaseHelper databaseHelper;
     private String userEmail;
-    
+    private List<Transaction> incomeList;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
-        
+        View view = inflater.inflate(R.layout.fragment_income, container, false);
+
         if (getArguments() != null) {
             userEmail = getArguments().getString("userEmail");
         }
-        
+
         databaseHelper = new DatabaseHelper(getContext());
-        
-        initializeViews(view);
-        setupPeriodSpinner();
-        
-        periodSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
-                loadDashboardData(position);
-            }
-            
-            @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
-        });
-        
+
+        incomeRecyclerView = view.findViewById(R.id.incomeRecyclerView);
+        addIncomeFab = view.findViewById(R.id.addIncomeFab);
+
+        setupRecyclerView();
+        loadIncome();
+
+        addIncomeFab.setOnClickListener(v -> showAddIncomeDialog(null));
+
         return view;
     }
-    
-    private void initializeViews(View view) {
-        periodSpinner = view.findViewById(R.id.periodSpinner);
-        totalIncomeText = view.findViewById(R.id.totalIncomeText);
-        totalExpensesText = view.findViewById(R.id.totalExpensesText);
-        balanceText = view.findViewById(R.id.balanceText);
-        pieChart = view.findViewById(R.id.pieChart);
-        categoryBarChart = view.findViewById(R.id.categoryBarChart);
+
+    private void setupRecyclerView() {
+        incomeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        incomeList = databaseHelper.getAllTransactions(userEmail, "income");
+        adapter = new TransactionAdapter(incomeList, this);
+        incomeRecyclerView.setAdapter(adapter);
     }
-    
-    private void setupPeriodSpinner() {
-        String[] periods = {"This Month", "Last Month", "Last 3 Months", "Last 6 Months", "This Year"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_item, periods);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        periodSpinner.setAdapter(adapter);
+
+    private void loadIncome() {
+        incomeList = databaseHelper.getAllTransactions(userEmail, "income");
+        adapter.updateTransactions(incomeList);
     }
-    
-    private void loadDashboardData(int periodPosition) {
-        long[] dateRange = getDateRange(periodPosition);
-        long startDate = dateRange[0];
-        long endDate = dateRange[1];
-        
-        double totalIncome = databaseHelper.getTotalAmount(userEmail, "income", startDate, endDate);
-        double totalExpenses = databaseHelper.getTotalAmount(userEmail, "expense", startDate, endDate);
-        double balance = totalIncome - totalExpenses;
-        
-        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "US"));
-        totalIncomeText.setText(formatter.format(totalIncome));
-        totalExpensesText.setText(formatter.format(totalExpenses));
-        balanceText.setText(formatter.format(balance));
-        
-        // Set balance color
-        if (balance >= 0) {
-            balanceText.setTextColor(Color.parseColor("#4CAF50"));
+
+    private void showAddIncomeDialog(Transaction transaction) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_transaction, null);
+        builder.setView(dialogView);
+
+        EditText amountInput = dialogView.findViewById(R.id.amountInput);
+        EditText dateInput = dialogView.findViewById(R.id.dateInput);
+        Spinner categorySpinner = dialogView.findViewById(R.id.categorySpinner);
+        EditText descriptionInput = dialogView.findViewById(R.id.descriptionInput);
+
+        // Setup category spinner
+        List<String> categories = databaseHelper.getCategories(userEmail, "income");
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, categories);
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(categoryAdapter);
+
+        // Setup date picker
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+
+        if (transaction != null) {
+            // Edit mode
+            amountInput.setText(String.valueOf(transaction.getAmount()));
+            calendar.setTimeInMillis(transaction.getDate());
+            dateInput.setText(dateFormat.format(calendar.getTime()));
+
+            int categoryPosition = categories.indexOf(transaction.getCategory());
+            if (categoryPosition >= 0) categorySpinner.setSelection(categoryPosition);
+
+            descriptionInput.setText(transaction.getDescription());
         } else {
-            balanceText.setTextColor(Color.parseColor("#F44336"));
+            dateInput.setText(dateFormat.format(calendar.getTime()));
         }
-        
-        setupPieChart(totalIncome, totalExpenses);
-        setupCategoryBarChart(startDate, endDate);
+
+        dateInput.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),
+                    (view, year, month, dayOfMonth) -> {
+                        calendar.set(year, month, dayOfMonth);
+                        dateInput.setText(dateFormat.format(calendar.getTime()));
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH));
+            datePickerDialog.show();
+        });
+
+        builder.setTitle(transaction == null ? "Add Income" : "Edit Income");
+        builder.setPositiveButton(transaction == null ? "Add" : "Update", (dialog, which) -> {
+            String amountStr = amountInput.getText().toString().trim();
+            String category = categorySpinner.getSelectedItem().toString();
+            String description = descriptionInput.getText().toString().trim();
+
+            if (amountStr.isEmpty()) {
+                Toast.makeText(getContext(), "Please enter amount", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            double amount = Double.parseDouble(amountStr);
+            long date = calendar.getTimeInMillis();
+
+            boolean success;
+            if (transaction == null) {
+                success = databaseHelper.addTransaction(userEmail, amount, date,
+                        category, description, "income") != -1;
+            } else {
+                success = databaseHelper.updateTransaction(transaction.getId(),
+                        amount, date, category, description);
+            }
+
+            if (success) {
+                Toast.makeText(getContext(),
+                        transaction == null ? "Income added" : "Income updated",
+                        Toast.LENGTH_SHORT).show();
+                loadIncome();
+            } else {
+                Toast.makeText(getContext(), "Operation failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", null);
+        builder.create().show();
     }
-    
-    private long[] getDateRange(int position) {
-        Calendar cal = Calendar.getInstance();
-        long endDate = cal.getTimeInMillis();
-        
-        switch (position) {
-            case 0: // This Month
-                cal.set(Calendar.DAY_OF_MONTH, 1);
-                cal.set(Calendar.HOUR_OF_DAY, 0);
-                cal.set(Calendar.MINUTE, 0);
-                break;
-            case 1: // Last Month
-                cal.add(Calendar.MONTH, -1);
-                cal.set(Calendar.DAY_OF_MONTH, 1);
-                break;
-            case 2: // Last 3 Months
-                cal.add(Calendar.MONTH, -3);
-                break;
-            case 3: // Last 6 Months
-                cal.add(Calendar.MONTH, -6);
-                break;
-            case 4: // This Year
-                cal.set(Calendar.DAY_OF_YEAR, 1);
-                cal.set(Calendar.HOUR_OF_DAY, 0);
-                break;
-        }
-        
-        long startDate = cal.getTimeInMillis();
-        return new long[]{startDate, endDate};
+
+    @Override
+    public void onEditClick(Transaction transaction) {
+        showAddIncomeDialog(transaction);
     }
-    
-    private void setupPieChart(double income, double expenses) {
-        List<PieEntry> entries = new ArrayList<>();
-        if (income > 0) entries.add(new PieEntry((float) income, "Income"));
-        if (expenses > 0) entries.add(new PieEntry((float) expenses, "Expenses"));
-        
-        PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setColors(Color.parseColor("#4CAF50"), Color.parseColor("#F44336"));
-        dataSet.setValueTextSize(12f);
-        dataSet.setValueTextColor(Color.WHITE);
-        
-        PieData data = new PieData(dataSet);
-        pieChart.setData(data);
-        pieChart.getDescription().setEnabled(false);
-        pieChart.setDrawHoleEnabled(true);
-        pieChart.setHoleRadius(40f);
-        pieChart.invalidate();
-    }
-    
-    private void setupCategoryBarChart(long startDate, long endDate) {
-        List<Transaction> expenses = databaseHelper.getTransactionsByPeriod(
-                userEmail, "expense", startDate, endDate);
-        
-        Map<String, Float> categoryTotals = new HashMap<>();
-        for (Transaction t : expenses) {
-            float current = categoryTotals.getOrDefault(t.getCategory(), 0f);
-            categoryTotals.put(t.getCategory(), current + (float) t.getAmount());
-        }
-        
-        List<BarEntry> entries = new ArrayList<>();
-        List<String> labels = new ArrayList<>();
-        int index = 0;
-        for (Map.Entry<String, Float> entry : categoryTotals.entrySet()) {
-            entries.add(new BarEntry(index++, entry.getValue()));
-            labels.add(entry.getKey());
-        }
-        
-        BarDataSet dataSet = new BarDataSet(entries, "Expenses by Category");
-        dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
-        dataSet.setValueTextSize(10f);
-        
-        BarData data = new BarData(dataSet);
-        categoryBarChart.setData(data);
-        categoryBarChart.getDescription().setEnabled(false);
-        categoryBarChart.getXAxis().setGranularity(1f);
-        categoryBarChart.invalidate();
+
+    @Override
+    public void onDeleteClick(Transaction transaction) {
+        new AlertDialog.Builder(getContext())
+                .setTitle("Delete Income")
+                .setMessage("Are you sure you want to delete this income?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    boolean success = databaseHelper.deleteTransaction(transaction.getId());
+                    if (success) {
+                        Toast.makeText(getContext(), "Income deleted", Toast.LENGTH_SHORT).show();
+                        loadIncome();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 }

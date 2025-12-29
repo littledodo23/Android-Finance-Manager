@@ -9,37 +9,42 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
-    
+
     private TextInputLayout emailLayout, passwordLayout;
     private TextInputEditText emailInput, passwordInput;
     private CheckBox rememberMeCheckbox;
     private Button signInButton, signUpButton;
-    
+
     private DatabaseHelper databaseHelper;
     private SharedPreferences sharedPreferences;
+    private ExecutorService executorService;
+
     private static final String PREFS_NAME = "FinanceManagerPrefs";
     private static final String KEY_EMAIL = "email";
     private static final String KEY_REMEMBER = "remember";
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
         databaseHelper = new DatabaseHelper(this);
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        
+        executorService = Executors.newSingleThreadExecutor();
+
         initializeViews();
         checkRememberedUser();
-        
+
         signInButton.setOnClickListener(v -> signIn());
         signUpButton.setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, SignUpActivity.class));
         });
     }
-    
+
     private void initializeViews() {
         emailLayout = findViewById(R.id.emailLayout);
         passwordLayout = findViewById(R.id.passwordLayout);
@@ -49,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         signInButton = findViewById(R.id.signInButton);
         signUpButton = findViewById(R.id.signUpButton);
     }
-    
+
     private void checkRememberedUser() {
         boolean remember = sharedPreferences.getBoolean(KEY_REMEMBER, false);
         if (remember) {
@@ -58,49 +63,68 @@ public class MainActivity extends AppCompatActivity {
             rememberMeCheckbox.setChecked(true);
         }
     }
-    
+
     private void signIn() {
         emailLayout.setError(null);
         passwordLayout.setError(null);
-        
+
         String email = emailInput.getText().toString().trim();
         String password = passwordInput.getText().toString().trim();
-        
+
         // Validate
         boolean isValid = true;
-        
+
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailLayout.setError("Enter a valid email");
             isValid = false;
         }
-        
+
         if (password.isEmpty()) {
             passwordLayout.setError("Enter your password");
             isValid = false;
         }
-        
+
         if (!isValid) return;
-        
-        // Check login
-        if (databaseHelper.checkUserLogin(email, password)) {
-            // Save remember me preference
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            if (rememberMeCheckbox.isChecked()) {
-                editor.putBoolean(KEY_REMEMBER, true);
-                editor.putString(KEY_EMAIL, email);
-            } else {
-                editor.putBoolean(KEY_REMEMBER, false);
-                editor.remove(KEY_EMAIL);
-            }
-            editor.apply();
-            
-            // Navigate to Dashboard
-            Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
-            intent.putExtra("userEmail", email);
-            startActivity(intent);
-            finish();
-        } else {
-            Toast.makeText(this, "Invalid email or password", Toast.LENGTH_SHORT).show();
+
+        // Disable button to prevent multiple clicks
+        signInButton.setEnabled(false);
+
+        // Check login in background thread
+        executorService.execute(() -> {
+            boolean loginSuccess = databaseHelper.checkUserLogin(email, password);
+
+            runOnUiThread(() -> {
+                signInButton.setEnabled(true);
+
+                if (loginSuccess) {
+                    // Save remember me preference
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    if (rememberMeCheckbox.isChecked()) {
+                        editor.putBoolean(KEY_REMEMBER, true);
+                        editor.putString(KEY_EMAIL, email);
+                    } else {
+                        editor.putBoolean(KEY_REMEMBER, false);
+                        editor.remove(KEY_EMAIL);
+                    }
+                    editor.apply();
+
+                    // Navigate to Dashboard
+                    Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
+                    intent.putExtra("userEmail", email);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(MainActivity.this, "Invalid email or password", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (executorService != null) {
+            executorService.shutdown();
         }
     }
 }

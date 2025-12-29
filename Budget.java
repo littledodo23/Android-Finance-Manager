@@ -1,6 +1,7 @@
 // ==================== Budget.java ====================
 package com.finance.manager;
 
+
 public class Budget {
     private int id;
     private String userEmail;
