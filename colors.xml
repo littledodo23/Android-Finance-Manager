@@ -1,10 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Primary brand colors -->
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
-    
+
+    <!-- Material Design 3 colors (required by themes) -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Custom colors for finance app -->
     <color name="income_green">#4CAF50</color>
+    <color name="income_green_light">#81C784</color>
     <color name="expense_red">#F44336</color>
-    <color name="budget_warning">#FF9800</color>
+    <color name="expense_red_light">#E57373</color>
+    <color name="balance_blue">#2196F3</color>
+    <color name="balance_blue_light">#64B5F6</color>
+
+    <!-- Background colors -->
+    <color name="background_light">#F5F5F5</color>
+    <color name="card_white">#FFFFFF</color>
+
+    <!-- Text colors -->
+    <color name="text_dark">#212121</color>
+    <color name="text_gray">#757575</color>
+    <color name="text_light_gray">#BDBDBD</color>
+
+    <!-- Alert colors -->
+    <color name="alert_orange">#FF9800</color>
+    <color name="alert_yellow">#FFC107</color>
 </resources>
