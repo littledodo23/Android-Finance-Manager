@@ -1,80 +1,233 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView 
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:elevation="4dp">
+    app:cardCornerRadius="16dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="20dp">
 
-        <TextView
-            android:id="@+id/categoryText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Category"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
-
+        <!-- Header Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="4dp">
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
 
+            <!-- Category Icon -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#F5F5F5">
+
+                <ImageView
+                    android:id="@+id/categoryIcon"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_category"
+                    android:tint="#667eea"/>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Category Name -->
             <TextView
-                android:id="@+id/limitText"
+                android:id="@+id/categoryText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Limit: $0.00"
-                android:textSize="14sp"/>
+                android:text="Category"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#1A1A1A"
+                android:layout_marginStart="12dp"/>
 
-            <TextView
-                android:id="@+id/percentageText"
+            <!-- Percentage Badge -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/percentageChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0%"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:chipBackgroundColor="#E3F2FD"
+                app:chipStrokeWidth="0dp"/>
         </LinearLayout>
 
-        <ProgressBar
-            android:id="@+id/budgetProgressBar"
-            style="?android:attr/progressBarStyleHorizontal"
+        <!-- Budget Limit & Spent Amount -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:max="100"
-            android:layout_marginBottom="8dp"/>
-
-        <TextView
-            android:id="@+id/spentText"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Spent: $0.00"
-            android:textSize="14sp"
-            android:layout_marginBottom="4dp"/>
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
 
-        <TextView
-            android:id="@+id/remainingText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Remaining: $0.00"
-            android:textSize="14sp"
-            android:layout_marginBottom="8dp"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/alertText"
-            android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Limit"
+                    android:textSize="11sp"
+                    android:textColor="#999999"
+                    android:letterSpacing="0.1"/>
+
+                <TextView
+                    android:id="@+id/limitText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="$0.00"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#1A1A1A"
+                    android:layout_marginTop="2dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Spent"
+                    android:textSize="11sp"
+                    android:textColor="#999999"
+                    android:letterSpacing="0.1"/>
+
+                <TextView
+                    android:id="@+id/spentText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="$0.00"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#F44336"
+                    android:layout_marginTop="2dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Remaining"
+                    android:textSize="11sp"
+                    android:textColor="#999999"
+                    android:letterSpacing="0.1"/>
+
+                <TextView
+                    android:id="@+id/remainingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="$0.00"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#4CAF50"
+                    android:layout_marginTop="2dp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Progress Bar -->
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/budgetProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_marginBottom="12dp"
+            app:indicatorColor="#667eea"
+            app:trackColor="#E0E0E0"
+            app:trackCornerRadius="4dp"/>
+
+        <!-- Alert Message -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/alertCard"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="⚠️ Alert message"
-            android:textSize="14sp"
-            android:textColor="@android:color/holo_orange_dark"
-            android:visibility="gone"/>
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#FFF3E0"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_warning"
+                    android:tint="#F57C00"
+                    android:layout_marginEnd="8dp"/>
+
+                <TextView
+                    android:id="@+id/alertText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="You've exceeded 80% of your budget"
+                    android:textSize="13sp"
+                    android:textColor="#E65100"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp"
+            android:gravity="end">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/editBudgetButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Edit"
+                android:textSize="13sp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                app:icon="@drawable/ic_edit"
+                app:iconSize="16dp"
+                app:cornerRadius="8dp"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_marginEnd="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/deleteBudgetButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Delete"
+                android:textSize="13sp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="#F44336"
+                app:icon="@drawable/ic_delete"
+                app:iconTint="#F44336"
+                app:iconSize="16dp"
+                app:cornerRadius="8dp"
+                style="@style/Widget.MaterialComponents.Button.TextButton"/>
+        </LinearLayout>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

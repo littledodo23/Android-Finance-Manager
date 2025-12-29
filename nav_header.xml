@@ -1,27 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="176dp"
+    android:layout_height="200dp"
     android:background="@drawable/gradient_background"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="24dp"
     android:gravity="bottom">
+
+    <View
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/ic_profile"
+        android:layout_marginBottom="16dp"/>
 
     <TextView
         android:id="@+id/userNameText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="User Name"
+        android:text="John Smith"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="@android:color/white"/>
+        android:textColor="@android:color/white"
+        android:shadowColor="#40000000"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="2"/>
 
     <TextView
         android:id="@+id/userEmailText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="user@email.com"
+        android:text="john@gmail.com"
         android:textSize="14sp"
-        android:textColor="@android:color/white"
-        android:layout_marginTop="4dp"/>
+        android:textColor="#E0FFFFFF"
+        android:layout_marginTop="4dp"
+        android:shadowColor="#40000000"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="2"/>
 </LinearLayout>
