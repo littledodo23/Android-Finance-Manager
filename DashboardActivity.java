@@ -13,43 +13,48 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.navigation.NavigationView;
 
-public class DashboardActivity extends AppCompatActivity 
+public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    
+
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private Toolbar toolbar;
-    
+
     private String userEmail;
     private DatabaseHelper databaseHelper;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
-        
+
         userEmail = getIntent().getStringExtra("userEmail");
         databaseHelper = new DatabaseHelper(this);
-        
+
         initializeViews();
         setupNavigationDrawer();
         updateNavHeader();
-        
+
         // Load Home fragment by default
         if (savedInstanceState == null) {
             loadFragment(new HomeFragment(), "Home");
             navigationView.setCheckedItem(R.id.nav_home);
         }
     }
-    
+
     private void initializeViews() {
         toolbar = findViewById(R.id.toolbar);
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
-        
+
         setSupportActionBar(toolbar);
+
+        // Set toolbar title color
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Home");
+        }
     }
-    
+
     private void setupNavigationDrawer() {
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
@@ -57,28 +62,53 @@ public class DashboardActivity extends AppCompatActivity
                 R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        
+
+        // Customize hamburger icon color
+        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(android.R.color.white));
+
         navigationView.setNavigationItemSelectedListener(this);
     }
-    
+
     private void updateNavHeader() {
         User user = databaseHelper.getUserInfo(userEmail);
         if (user != null) {
             TextView nameText = navigationView.getHeaderView(0).findViewById(R.id.userNameText);
             TextView emailText = navigationView.getHeaderView(0).findViewById(R.id.userEmailText);
-            
+            TextView initialsText = navigationView.getHeaderView(0).findViewById(R.id.userInitialsText);
+
             nameText.setText(user.getFullName());
             emailText.setText(user.getEmail());
+
+            // Set user initials
+            String initials = getUserInitials(user.getFirstName(), user.getLastName());
+            initialsText.setText(initials);
         }
     }
-    
+
+    /**
+     * Get user initials from first and last name
+     */
+    private String getUserInitials(String firstName, String lastName) {
+        String initials = "";
+
+        if (firstName != null && !firstName.isEmpty()) {
+            initials += firstName.charAt(0);
+        }
+
+        if (lastName != null && !lastName.isEmpty()) {
+            initials += lastName.charAt(0);
+        }
+
+        return initials.toUpperCase();
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        
+
         Fragment fragment = null;
         String title = "";
-        
+
         if (id == R.id.nav_home) {
             fragment = new HomeFragment();
             title = "Home";
@@ -101,43 +131,61 @@ public class DashboardActivity extends AppCompatActivity
             logout();
             return true;
         }
-        
+
         if (fragment != null) {
             loadFragment(fragment, title);
         }
-        
+
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
-    
+
     private void loadFragment(Fragment fragment, String title) {
         Bundle bundle = new Bundle();
         bundle.putString("userEmail", userEmail);
         fragment.setArguments(bundle);
-        
+
         getSupportFragmentManager()
                 .beginTransaction()
+                .setCustomAnimations(
+                        android.R.anim.fade_in,
+                        android.R.anim.fade_out
+                )
                 .replace(R.id.fragment_container, fragment)
                 .commit();
-        
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(title);
         }
     }
-    
+
     private void logout() {
-        Intent intent = new Intent(DashboardActivity.this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
+        // Show confirmation dialog
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Logout")
+                .setMessage("Are you sure you want to logout?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    Intent intent = new Intent(DashboardActivity.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
-    
+
     @Override
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            // Show exit confirmation
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Exit App")
+                    .setMessage("Are you sure you want to exit?")
+                    .setPositiveButton("Yes", (dialog, which) -> finish())
+                    .setNegativeButton("Cancel", null)
+                    .show();
         }
     }
 }
