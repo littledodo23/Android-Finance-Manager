@@ -13,6 +13,9 @@ import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     
+    // Singleton instance
+    private static DatabaseHelper instance;
+    
     private static final String DATABASE_NAME = "FinanceManager.db";
     private static final int DATABASE_VERSION = 1;
     
@@ -47,8 +50,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COL_MONTH = "month";
     private static final String COL_YEAR = "year";
     
-    public DatabaseHelper(Context context) {
+    // Private constructor
+    private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+    
+    // Public method to get singleton instance
+    public static synchronized DatabaseHelper getInstance(Context context) {
+        if (instance == null) {
+            instance = new DatabaseHelper(context.getApplicationContext());
+        }
+        return instance;
     }
     
     @Override
@@ -93,18 +105,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_YEAR + " INTEGER NOT NULL, " +
                 "FOREIGN KEY(" + COL_USER_EMAIL + ") REFERENCES " + TABLE_USERS + "(" + COL_EMAIL + "))";
         db.execSQL(createBudgetsTable);
-        
-        // Insert default categories for easier start
-        insertDefaultCategories(db);
-    }
-    
-    private void insertDefaultCategories(SQLiteDatabase db) {
-        // Default expense categories
-        String[] expenseCategories = {"Food", "Transportation", "Bills", "Entertainment", "Shopping", "Health", "Other"};
-        // Default income categories
-        String[] incomeCategories = {"Salary", "Scholarship", "Freelance", "Investment", "Gift", "Other"};
-        
-        // These will be added per user when they sign up
     }
     
     @Override
@@ -132,7 +132,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-            return password; // Fallback (not recommended for production)
+            return password;
         }
     }
     
@@ -146,7 +146,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         
         long result = db.insert(TABLE_USERS, null, values);
         
-        // Add default categories for this user
         if (result != -1) {
             addDefaultCategoriesForUser(email);
         }
@@ -225,7 +224,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     
     public boolean updateUserPassword(String email, String oldPassword, String newPassword) {
-        // First verify old password
         if (!checkUserLogin(email, oldPassword)) {
             return false;
         }
@@ -423,7 +421,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public double getSpentInCategory(String userEmail, String category, int month, int year) {
         SQLiteDatabase db = this.getReadableDatabase();
         
-        // Get first and last day of the month
         java.util.Calendar calendar = java.util.Calendar.getInstance();
         calendar.set(year, month - 1, 1, 0, 0, 0);
         long startDate = calendar.getTimeInMillis();
