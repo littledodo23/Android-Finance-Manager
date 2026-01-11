@@ -1,6 +1,5 @@
 package com.finance.manager;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,10 +22,8 @@ public class SettingsFragment extends Fragment {
     private Spinner defaultPeriodSpinner;
     private Button manageCategoriesButton;
     
-    private SharedPreferences sharedPreferences;
-    private static final String PREFS_NAME = "FinanceManagerSettings";
-    private static final String KEY_THEME = "theme";
-    private static final String KEY_DEFAULT_PERIOD = "defaultPeriod";
+    private PreferenceManager preferenceManager;
+    private DatabaseHelper databaseHelper;
     
     private String userEmail;
     
@@ -40,17 +37,19 @@ public class SettingsFragment extends Fragment {
             userEmail = getArguments().getString("userEmail");
         }
         
-        sharedPreferences = getActivity().getSharedPreferences(PREFS_NAME, getContext().MODE_PRIVATE);
+        // Get Singleton instances
+        preferenceManager = PreferenceManager.getInstance(getContext());
+        databaseHelper = DatabaseHelper.getInstance(getContext());
         
         initializeViews(view);
         loadSettings();
         
         themeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.lightModeRadio) {
-                saveTheme("light");
+                preferenceManager.saveTheme("light");
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             } else if (checkedId == R.id.darkModeRadio) {
-                saveTheme("dark");
+                preferenceManager.saveTheme("dark");
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
             }
         });
@@ -58,7 +57,7 @@ public class SettingsFragment extends Fragment {
         defaultPeriodSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
-                saveDefaultPeriod(position);
+                preferenceManager.saveDefaultPeriod(position);
             }
             
             @Override
@@ -86,26 +85,17 @@ public class SettingsFragment extends Fragment {
     }
     
     private void loadSettings() {
-        // Load theme
-        String theme = sharedPreferences.getString(KEY_THEME, "light");
+        // Load theme using Singleton
+        String theme = preferenceManager.getTheme();
         if ("dark".equals(theme)) {
             darkModeRadio.setChecked(true);
         } else {
             lightModeRadio.setChecked(true);
         }
         
-        // Load default period
-        int defaultPeriod = sharedPreferences.getInt(KEY_DEFAULT_PERIOD, 0);
+        // Load default period using Singleton
+        int defaultPeriod = preferenceManager.getDefaultPeriod();
         defaultPeriodSpinner.setSelection(defaultPeriod);
-    }
-    
-    private void saveTheme(String theme) {
-        sharedPreferences.edit().putString(KEY_THEME, theme).apply();
-        Toast.makeText(getContext(), "Theme changed", Toast.LENGTH_SHORT).show();
-    }
-    
-    private void saveDefaultPeriod(int period) {
-        sharedPreferences.edit().putInt(KEY_DEFAULT_PERIOD, period).apply();
     }
     
     private void showManageCategoriesDialog() {
@@ -143,8 +133,7 @@ public class SettingsFragment extends Fragment {
                 .setPositiveButton("Add", (dialog, which) -> {
                     String categoryName = input.getText().toString().trim();
                     if (!categoryName.isEmpty()) {
-                        DatabaseHelper db = new DatabaseHelper(getContext());
-                        boolean success = db.addCategory(userEmail, categoryName, type);
+                        boolean success = databaseHelper.addCategory(userEmail, categoryName, type);
                         if (success) {
                             Toast.makeText(getContext(), "Category added", Toast.LENGTH_SHORT).show();
                         } else {
@@ -157,8 +146,7 @@ public class SettingsFragment extends Fragment {
     }
     
     private void showDeleteCategoryDialog(String type) {
-        DatabaseHelper db = new DatabaseHelper(getContext());
-        java.util.List<String> categories = db.getCategories(userEmail, type);
+        java.util.List<String> categories = databaseHelper.getCategories(userEmail, type);
         
         if (categories.isEmpty()) {
             Toast.makeText(getContext(), "No categories to delete", Toast.LENGTH_SHORT).show();
@@ -171,7 +159,7 @@ public class SettingsFragment extends Fragment {
                 .setTitle("Delete " + (type.equals("income") ? "Income" : "Expense") + " Category")
                 .setItems(categoriesArray, (dialog, which) -> {
                     String categoryName = categoriesArray[which];
-                    boolean success = db.deleteCategory(userEmail, categoryName, type);
+                    boolean success = databaseHelper.deleteCategory(userEmail, categoryName, type);
                     if (success) {
                         Toast.makeText(getContext(), "Category deleted", Toast.LENGTH_SHORT).show();
                     } else {
