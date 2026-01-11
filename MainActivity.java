@@ -1,7 +1,6 @@
 package com.finance.manager;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -20,20 +19,17 @@ public class MainActivity extends AppCompatActivity {
     private Button signInButton, signUpButton;
 
     private DatabaseHelper databaseHelper;
-    private SharedPreferences sharedPreferences;
+    private PreferenceManager preferenceManager;
     private ExecutorService executorService;
-
-    private static final String PREFS_NAME = "FinanceManagerPrefs";
-    private static final String KEY_EMAIL = "email";
-    private static final String KEY_REMEMBER = "remember";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        databaseHelper = new DatabaseHelper(this);
-        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        // Get Singleton instances
+        databaseHelper = DatabaseHelper.getInstance(this);
+        preferenceManager = PreferenceManager.getInstance(this);
         executorService = Executors.newSingleThreadExecutor();
 
         initializeViews();
@@ -56,9 +52,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkRememberedUser() {
-        boolean remember = sharedPreferences.getBoolean(KEY_REMEMBER, false);
+        boolean remember = preferenceManager.isRememberMeEnabled();
         if (remember) {
-            String savedEmail = sharedPreferences.getString(KEY_EMAIL, "");
+            String savedEmail = preferenceManager.getRememberedEmail();
             emailInput.setText(savedEmail);
             rememberMeCheckbox.setChecked(true);
         }
@@ -97,16 +93,8 @@ public class MainActivity extends AppCompatActivity {
                 signInButton.setEnabled(true);
 
                 if (loginSuccess) {
-                    // Save remember me preference
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    if (rememberMeCheckbox.isChecked()) {
-                        editor.putBoolean(KEY_REMEMBER, true);
-                        editor.putString(KEY_EMAIL, email);
-                    } else {
-                        editor.putBoolean(KEY_REMEMBER, false);
-                        editor.remove(KEY_EMAIL);
-                    }
-                    editor.apply();
+                    // Save remember me preference using Singleton
+                    preferenceManager.saveRememberMe(email, rememberMeCheckbox.isChecked());
 
                     // Navigate to Dashboard
                     Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
