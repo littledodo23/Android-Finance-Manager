@@ -22,11 +22,11 @@
     <color name="balance_blue">#2196F3</color>
     <color name="balance_blue_light">#64B5F6</color>
 
-    <!-- Background colors -->
+    <!-- Background colors - Light Mode -->
     <color name="background_light">#F5F5F5</color>
     <color name="card_white">#FFFFFF</color>
 
-    <!-- Text colors -->
+    <!-- Text colors - Light Mode -->
     <color name="text_dark">#212121</color>
     <color name="text_gray">#757575</color>
     <color name="text_light_gray">#BDBDBD</color>
@@ -34,4 +34,35 @@
     <!-- Alert colors -->
     <color name="alert_orange">#FF9800</color>
     <color name="alert_yellow">#FFC107</color>
+
+    <!-- ========== DARK MODE COLORS (Better Contrast) ========== -->
+    <!-- Dark backgrounds - softer than pure black -->
+    <color name="dark_background">#121212</color>
+    <color name="dark_surface">#1E1E1E</color>
+    <color name="dark_surface_variant">#2A2A2A</color>
+    <color name="dark_border">#404040</color>
+
+    <!-- Dark text colors - HIGH contrast for readability -->
+    <color name="dark_text_primary">#FFFFFF</color>
+    <color name="dark_text_secondary">#E0E0E0</color>
+    <color name="dark_text_tertiary">#B0B0B0</color>
+
+    <!-- Dark primary colors - more vibrant -->
+    <color name="dark_primary">#A78BFA</color>
+    <color name="dark_primary_variant">#8B5CF6</color>
+    <color name="dark_secondary">#C084FC</color>
+
+    <!-- Dark mode card colors with better contrast -->
+    <color name="dark_card_background">#1E1E1E</color>
+    <color name="dark_card_stroke">#404040</color>
+    <!-- Add these to your colors.xml (Light Mode) -->
+
+    <!-- Card background colors for light mode -->
+    <color name="income_card_bg">#E8F5E9</color>
+    <color name="expense_card_bg">#FFEBEE</color>
+    <color name="balance_card_bg">#E3F2FD</color>
+    <!-- Spinner colors for light mode -->
+    <color name="spinner_background">#F5F5F5</color>
+    <color name="spinner_border">#E0E0E0</color>
+    <color name="spinner_text">#212121</color>
 </resources>

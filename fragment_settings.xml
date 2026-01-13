@@ -72,7 +72,12 @@
                 <Spinner
                     android:id="@+id/defaultPeriodSpinner"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/spinner_background"
+                    android:minHeight="48dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:textColor="@color/spinner_text"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

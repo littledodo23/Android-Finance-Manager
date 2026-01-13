@@ -1,44 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Main Navigation Group -->
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
-            android:icon="@android:drawable/ic_dialog_info"
-            android:title="Home" />
+            android:icon="@drawable/home"
+            android:title="Dashboard"
+            android:titleCondensed="Dashboard"/>
 
         <item
             android:id="@+id/nav_income"
-            android:icon="@android:drawable/ic_input_add"
-            android:title="Income" />
+            android:icon="@android:drawable/arrow_down_float"
+            android:title="Income"
+            android:titleCondensed="Income"/>
 
         <item
             android:id="@+id/nav_expenses"
-            android:icon="@android:drawable/ic_menu_recent_history"
-            android:title="Expenses" />
+            android:icon="@android:drawable/arrow_up_float"
+            android:title="Expenses"
+            android:titleCondensed="Expenses"/>
 
         <item
             android:id="@+id/nav_budgets"
             android:icon="@android:drawable/ic_menu_agenda"
-            android:title="Budgets &amp; Goals" />
+            android:title="Budgets &amp; Goals"
+            android:titleCondensed="Budgets"/>
     </group>
 
+    <!-- Divider -->
     <item android:title="Account">
         <menu>
             <item
                 android:id="@+id/nav_profile"
                 android:icon="@android:drawable/ic_menu_myplaces"
-                android:title="Profile" />
+                android:title="My Profile"/>
 
             <item
                 android:id="@+id/nav_settings"
                 android:icon="@android:drawable/ic_menu_preferences"
-                android:title="Settings" />
+                android:title="Settings"/>
 
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@android:drawable/ic_lock_power_off"
-                android:title="Logout" />
+                android:title="Logout"/>
         </menu>
     </item>
 </menu>

@@ -11,35 +11,48 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <!-- Enhanced Toolbar with gradient -->
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            android:elevation="4dp"/>
+            android:layout_height="wrap_content"
+            android:background="@drawable/gradient_background"
+            android:elevation="8dp">
 
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:titleTextAppearance="@style/ToolbarTitleText"/>
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <!-- Fragment Container -->
         <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:background="@color/background_light"/>
     </LinearLayout>
 
+    <!-- Enhanced Navigation View -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
-        android:layout_width="280dp"
+        android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         android:background="@android:color/white"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/nav_menu"
-        app:itemIconTint="@null"
+        app:itemIconTint="@color/colorPrimary"
         app:itemTextColor="@color/text_dark"
         app:itemBackground="@drawable/nav_item_background"
         app:itemHorizontalPadding="16dp"
-        app:itemVerticalPadding="8dp"
-        app:itemIconPadding="16dp"
-        app:itemIconSize="24dp"/>
+        app:itemIconPadding="20dp"
+        app:itemIconSize="26dp"
+        app:itemShapeFillColor="@color/colorPrimary"
+        app:itemShapeInsetStart="8dp"
+        app:itemShapeInsetEnd="8dp"
+        android:elevation="16dp"/>
 </androidx.drawerlayout.widget.DrawerLayout>

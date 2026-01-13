@@ -147,15 +147,16 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Progress Bar -->
-        <com.google.android.material.progressindicator.LinearProgressIndicator
+        <!-- Progress Bar - Using standard ProgressBar for compatibility -->
+        <ProgressBar
             android:id="@+id/budgetProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="8dp"
             android:layout_marginBottom="12dp"
-            app:indicatorColor="#667eea"
-            app:trackColor="#E0E0E0"
-            app:trackCornerRadius="4dp"/>
+            android:progressDrawable="@drawable/progress_bar_rounded"
+            android:progress="0"
+            android:max="100"/>
 
         <!-- Alert Message -->
         <com.google.android.material.card.MaterialCardView

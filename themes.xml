@@ -1,105 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base Light Theme -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <!-- Base Light Theme - Changed to MaterialComponents -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary colors -->
         <item name="colorPrimary">#667eea</item>
-        <item name="colorPrimaryVariant">#764ba2</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
-
-        <!-- Secondary colors -->
-        <item name="colorSecondary">#f093fb</item>
-        <item name="colorSecondaryVariant">#c471f5</item>
-        <item name="colorOnSecondary">#000000</item>
+        <item name="colorPrimaryDark">#764ba2</item>
+        <item name="colorAccent">#f093fb</item>
 
         <!-- Background colors -->
         <item name="android:colorBackground">#F8F9FA</item>
-        <item name="colorSurface">#FFFFFF</item>
-        <item name="colorOnSurface">#1A1A1A</item>
+        <item name="android:textColorPrimary">#1A1A1A</item>
+        <item name="android:textColorSecondary">#666666</item>
 
         <!-- Status bar -->
         <item name="android:statusBarColor">#667eea</item>
-        <item name="android:windowLightStatusBar">false</item>
 
         <!-- Navigation bar -->
         <item name="android:navigationBarColor">#FFFFFF</item>
-        <item name="android:windowLightNavigationBar">true</item>
 
         <!-- Typography -->
-        <item name="textAppearanceHeadline1">@style/TextAppearance.App.Headline1</item>
-        <item name="textAppearanceHeadline2">@style/TextAppearance.App.Headline2</item>
-        <item name="textAppearanceBody1">@style/TextAppearance.App.Body1</item>
-
-        <!-- Component styles -->
-        <item name="materialCardViewStyle">@style/Widget.App.CardView</item>
-        <item name="materialButtonStyle">@style/Widget.App.Button</item>
-        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
+        <item name="android:textAppearance">@style/TextAppearance.App.Body1</item>
 
         <!-- Enable edge-to-edge -->
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
+    <!-- ToolbarTitleText Style -->
+    <style name="ToolbarTitleText">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <!-- Typography Styles -->
-    <style name="TextAppearance.App.Headline1" parent="TextAppearance.MaterialComponents.Headline1">
-        <item name="fontFamily">sans-serif-medium</item>
+    <style name="TextAppearance.App.Headline1" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">32sp</item>
         <item name="android:textColor">#1A1A1A</item>
     </style>
 
-    <style name="TextAppearance.App.Headline2" parent="TextAppearance.MaterialComponents.Headline2">
-        <item name="fontFamily">sans-serif-medium</item>
+    <style name="TextAppearance.App.Headline2" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">24sp</item>
         <item name="android:textColor">#1A1A1A</item>
     </style>
 
     <style name="TextAppearance.App.Body1" parent="TextAppearance.MaterialComponents.Body1">
-        <item name="fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif</item>
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">#666666</item>
     </style>
 
     <!-- Card View Style -->
+    <style name="Widget.App" parent="android:Widget" />
+
     <style name="Widget.App.CardView" parent="Widget.MaterialComponents.CardView">
         <item name="cardCornerRadius">16dp</item>
         <item name="cardElevation">4dp</item>
-        <item name="cardBackgroundColor">@android:color/white</item>
-        <item name="strokeWidth">0dp</item>
+        <item name="cardBackgroundColor">@color/card_white</item>
     </style>
 
     <!-- Button Styles -->
     <style name="Widget.App.Button" parent="Widget.MaterialComponents.Button">
-        <item name="cornerRadius">12dp</item>
         <item name="android:textSize">16sp</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:letterSpacing">0.02</item>
-        <item name="elevation">4dp</item>
     </style>
 
     <style name="Widget.App.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="cornerRadius">12dp</item>
-        <item name="strokeWidth">2dp</item>
         <item name="android:textSize">16sp</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="Widget.App.Button.Text" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="cornerRadius">8dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textAllCaps">false</item>
     </style>
 
-    <!-- TextInputLayout Style -->
+    <!-- TextInputLayout Style - Simplified without hintTextColor -->
     <style name="Widget.App.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">@color/text_input_stroke</item>
-        <item name="boxCornerRadiusTopStart">12dp</item>
-        <item name="boxCornerRadiusTopEnd">12dp</item>
-        <item name="boxCornerRadiusBottomStart">12dp</item>
-        <item name="boxCornerRadiusBottomEnd">12dp</item>
-        <item name="hintTextColor">#667eea</item>
-        <item name="boxStrokeWidth">2dp</item>
-        <item name="boxStrokeWidthFocused">2dp</item>
+        <item name="boxStrokeColor">#667eea</item>
     </style>
 
     <!-- FAB Style -->
@@ -107,35 +88,92 @@
         <item name="backgroundTint">#667eea</item>
         <item name="tint">@android:color/white</item>
         <item name="elevation">8dp</item>
-        <item name="pressedTranslationZ">12dp</item>
     </style>
 
     <!-- Chip Style -->
-    <style name="Widget.App.Chip" parent="Widget.MaterialComponents.Chip.Action">
-        <item name="chipCornerRadius">8dp</item>
+    <style name="Widget.App.Chip" parent="Widget.MaterialComponents.Chip.Choice">
         <item name="chipBackgroundColor">#E3F2FD</item>
         <item name="android:textColor">#1976D2</item>
-        <item name="chipStrokeWidth">0dp</item>
     </style>
 
-    <!-- Dark Theme -->
-    <style name="AppTheme.Dark" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">#667eea</item>
-        <item name="colorPrimaryVariant">#764ba2</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
+    <!-- Spinner Styles -->
+    <style name="AppTheme.Spinner" parent="Widget.AppCompat.Spinner">
+        <item name="android:textColor">@color/text_dark</item>
+        <item name="android:popupBackground">@color/card_white</item>
+    </style>
 
-        <item name="colorSecondary">#f093fb</item>
-        <item name="colorSecondaryVariant">#c471f5</item>
-        <item name="colorOnSecondary">#000000</item>
+    <style name="SpinnerDropdownItem" parent="Widget.AppCompat.DropDownItem.Spinner">
+        <item name="android:textColor">@color/text_dark</item>
+        <item name="android:background">@color/card_white</item>
+    </style>
 
+    <!-- IMPROVED DARK THEME - Changed to MaterialComponents -->
+    <style name="AppTheme.Dark" parent="Theme.MaterialComponents.NoActionBar">
+        <!-- Vibrant Primary colors for dark mode -->
+        <item name="colorPrimary">#A78BFA</item>
+        <item name="colorPrimaryDark">#8B5CF6</item>
+        <item name="colorAccent">#C084FC</item>
+
+        <!-- Dark backgrounds with better contrast -->
         <item name="android:colorBackground">#121212</item>
-        <item name="colorSurface">#1E1E1E</item>
-        <item name="colorOnSurface">#FFFFFF</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:textColorSecondary">#E0E0E0</item>
 
+        <!-- Status and navigation bars -->
         <item name="android:statusBarColor">#000000</item>
-        <item name="android:navigationBarColor">#1E1E1E</item>
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:navigationBarColor">#000000</item>
+    </style>
+
+    <!-- Dark Mode Typography -->
+    <style name="TextAppearance.App.Headline1.Dark" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="TextAppearance.App.Headline2.Dark" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="TextAppearance.App.Body1.Dark" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#E0E0E0</item>
+    </style>
+
+    <!-- Dark Mode Card View -->
+    <style name="Widget.App.CardView.Dark" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">8dp</item>
+        <item name="cardBackgroundColor">#1E1E1E</item>
+    </style>
+
+    <!-- Dark Mode Button -->
+    <style name="Widget.App.Button.Dark" parent="Widget.MaterialComponents.Button">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="backgroundTint">#A78BFA</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <!-- Dark Mode TextInputLayout - Simplified without hintTextColor -->
+    <style name="Widget.App.TextInputLayout.Dark" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="boxStrokeColor">#A78BFA</item>
+    </style>
+
+    <!-- Dark Mode Spinner -->
+    <style name="AppTheme.Spinner.Dark" parent="Widget.AppCompat.Spinner">
+        <item name="android:textColor">#000000</item>
+        <item name="android:popupBackground">#FFFFFF</item>
+    </style>
+
+    <style name="SpinnerDropdownItem.Dark" parent="Widget.AppCompat.DropDownItem.Spinner">
+        <item name="android:textColor">#000000</item>
+        <item name="android:background">#FFFFFF</item>
     </style>
 
     <!-- Splash Screen Theme -->
@@ -144,4 +182,5 @@
         <item name="android:statusBarColor">#667eea</item>
         <item name="android:navigationBarColor">#667eea</item>
     </style>
+
 </resources>

@@ -106,6 +106,40 @@
                 app:chipSpacingHorizontal="8dp"/>
         </HorizontalScrollView>
 
+        <!-- Sort Spinner -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sort by:"
+                    android:textSize="14sp"
+                    android:textColor="#666666"
+                    android:layout_marginEnd="8dp"/>
+
+                <Spinner
+                    android:id="@+id/sortSpinner"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Transactions List -->
         <FrameLayout
             android:layout_width="match_parent"
