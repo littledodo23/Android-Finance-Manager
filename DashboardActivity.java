@@ -29,7 +29,7 @@ public class DashboardActivity extends AppCompatActivity
         setContentView(R.layout.activity_dashboard);
 
         userEmail = getIntent().getStringExtra("userEmail");
-        databaseHelper = new DatabaseHelper(this);
+        databaseHelper = DatabaseHelper.getInstance(this);
 
         initializeViews();
         setupNavigationDrawer();

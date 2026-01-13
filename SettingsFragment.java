@@ -16,34 +16,34 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 
 public class SettingsFragment extends Fragment {
-    
+
     private RadioGroup themeRadioGroup;
     private RadioButton lightModeRadio, darkModeRadio;
     private Spinner defaultPeriodSpinner;
     private Button manageCategoriesButton;
-    
+
     private PreferenceManager preferenceManager;
     private DatabaseHelper databaseHelper;
-    
+
     private String userEmail;
-    
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
-        
+
         if (getArguments() != null) {
             userEmail = getArguments().getString("userEmail");
         }
-        
+
         // Get Singleton instances
         preferenceManager = PreferenceManager.getInstance(getContext());
         databaseHelper = DatabaseHelper.getInstance(getContext());
-        
+
         initializeViews(view);
         loadSettings();
-        
+
         themeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.lightModeRadio) {
                 preferenceManager.saveTheme("light");
@@ -53,29 +53,29 @@ public class SettingsFragment extends Fragment {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
             }
         });
-        
+
         defaultPeriodSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
                 preferenceManager.saveDefaultPeriod(position);
             }
-            
+
             @Override
             public void onNothingSelected(android.widget.AdapterView<?> parent) {}
         });
-        
+
         manageCategoriesButton.setOnClickListener(v -> showManageCategoriesDialog());
-        
+
         return view;
     }
-    
+
     private void initializeViews(View view) {
         themeRadioGroup = view.findViewById(R.id.themeRadioGroup);
         lightModeRadio = view.findViewById(R.id.lightModeRadio);
         darkModeRadio = view.findViewById(R.id.darkModeRadio);
         defaultPeriodSpinner = view.findViewById(R.id.defaultPeriodSpinner);
         manageCategoriesButton = view.findViewById(R.id.manageCategoriesButton);
-        
+
         // Setup period spinner
         String[] periods = {"This Month", "Last Month", "Last 3 Months", "Last 6 Months", "This Year"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
@@ -83,7 +83,7 @@ public class SettingsFragment extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         defaultPeriodSpinner.setAdapter(adapter);
     }
-    
+
     private void loadSettings() {
         // Load theme using Singleton
         String theme = preferenceManager.getTheme();
@@ -92,16 +92,16 @@ public class SettingsFragment extends Fragment {
         } else {
             lightModeRadio.setChecked(true);
         }
-        
+
         // Load default period using Singleton
         int defaultPeriod = preferenceManager.getDefaultPeriod();
         defaultPeriodSpinner.setSelection(defaultPeriod);
     }
-    
+
     private void showManageCategoriesDialog() {
-        String[] options = {"Add Income Category", "Add Expense Category", 
-                           "Delete Income Category", "Delete Expense Category"};
-        
+        String[] options = {"Add Income Category", "Add Expense Category",
+                "Delete Income Category", "Delete Expense Category"};
+
         new androidx.appcompat.app.AlertDialog.Builder(getContext())
                 .setTitle("Manage Categories")
                 .setItems(options, (dialog, which) -> {
@@ -122,11 +122,11 @@ public class SettingsFragment extends Fragment {
                 })
                 .show();
     }
-    
+
     private void showAddCategoryDialog(String type) {
         android.widget.EditText input = new android.widget.EditText(getContext());
         input.setHint("Category name");
-        
+
         new androidx.appcompat.app.AlertDialog.Builder(getContext())
                 .setTitle("Add " + (type.equals("income") ? "Income" : "Expense") + " Category")
                 .setView(input)
@@ -144,17 +144,17 @@ public class SettingsFragment extends Fragment {
                 .setNegativeButton("Cancel", null)
                 .show();
     }
-    
+
     private void showDeleteCategoryDialog(String type) {
         java.util.List<String> categories = databaseHelper.getCategories(userEmail, type);
-        
+
         if (categories.isEmpty()) {
             Toast.makeText(getContext(), "No categories to delete", Toast.LENGTH_SHORT).show();
             return;
         }
-        
+
         String[] categoriesArray = categories.toArray(new String[0]);
-        
+
         new androidx.appcompat.app.AlertDialog.Builder(getContext())
                 .setTitle("Delete " + (type.equals("income") ? "Income" : "Expense") + " Category")
                 .setItems(categoriesArray, (dialog, which) -> {

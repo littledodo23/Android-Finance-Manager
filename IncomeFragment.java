@@ -28,6 +28,8 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -41,6 +43,7 @@ public class IncomeFragment extends Fragment implements TransactionAdapter.OnTra
     private TextView totalIncomeText, transactionCountText;
     private LinearLayout emptyStateLayout;
     private Button emptyStateAddButton;
+    private Spinner sortSpinner;
     private TransactionAdapter adapter;
 
     private DatabaseHelper databaseHelper;
@@ -48,6 +51,7 @@ public class IncomeFragment extends Fragment implements TransactionAdapter.OnTra
     private List<Transaction> incomeList;
     private List<Transaction> filteredList;
     private String selectedCategory = "All";
+    private int selectedSortOption = 0;
 
     @Nullable
     @Override
@@ -59,19 +63,18 @@ public class IncomeFragment extends Fragment implements TransactionAdapter.OnTra
             userEmail = getArguments().getString("userEmail");
         }
 
-        databaseHelper = new DatabaseHelper(getContext());
+        databaseHelper = DatabaseHelper.getInstance(requireContext());
+
 
         initializeViews(view);
         setupRecyclerView();
         setupSearchView();
         setupFilterChips();
+        setupSortSpinner();
         setupSwipeToDelete();
         loadIncome();
 
-        // FAB button click
         addIncomeFab.setOnClickListener(v -> showAddIncomeDialog(null));
-
-        // Empty state button click
         emptyStateAddButton.setOnClickListener(v -> showAddIncomeDialog(null));
 
         return view;
@@ -87,6 +90,7 @@ public class IncomeFragment extends Fragment implements TransactionAdapter.OnTra
         transactionCountText = view.findViewById(R.id.transactionCountText);
         emptyStateLayout = view.findViewById(R.id.emptyStateLayout);
         emptyStateAddButton = view.findViewById(R.id.emptyStateAddButton);
+        sortSpinner = view.findViewById(R.id.sortSpinner);
     }
 
     private void setupRecyclerView() {
@@ -115,7 +119,6 @@ public class IncomeFragment extends Fragment implements TransactionAdapter.OnTra
     private void setupFilterChips() {
         filterChipGroup.removeAllViews();
 
-        // Add "All" chip
         Chip allChip = new Chip(getContext());
         allChip.setText("All");
         allChip.setCheckable(true);
@@ -126,7 +129,6 @@ public class IncomeFragment extends Fragment implements TransactionAdapter.OnTra
         });
         filterChipGroup.addView(allChip);
 
-        // Add category chips
         List<String> categories = databaseHelper.getCategories(userEmail, "income");
         for (String category : categories) {
             Chip chip = new Chip(getContext());
@@ -138,6 +140,63 @@ public class IncomeFragment extends Fragment implements TransactionAdapter.OnTra
             });
             filterChipGroup.addView(chip);
         }
+    }
+
+    private void setupSortSpinner() {
+        String[] sortOptions = {"Newest First", "Oldest First", "Highest Amount", "Lowest Amount"};
+        ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, sortOptions);
+        sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sortSpinner.setAdapter(sortAdapter);
+
+        sortSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                selectedSortOption = position;
+                sortTransactions();
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+        });
+    }
+
+    private void sortTransactions() {
+        switch (selectedSortOption) {
+            case 0:
+                Collections.sort(filteredList, new Comparator<Transaction>() {
+                    @Override
+                    public int compare(Transaction t1, Transaction t2) {
+                        return Long.compare(t2.getDate(), t1.getDate());
+                    }
+                });
+                break;
+            case 1:
+                Collections.sort(filteredList, new Comparator<Transaction>() {
+                    @Override
+                    public int compare(Transaction t1, Transaction t2) {
+                        return Long.compare(t1.getDate(), t2.getDate());
+                    }
+                });
+                break;
+            case 2:
+                Collections.sort(filteredList, new Comparator<Transaction>() {
+                    @Override
+                    public int compare(Transaction t1, Transaction t2) {
+                        return Double.compare(t2.getAmount(), t1.getAmount());
+                    }
+                });
+                break;
+            case 3:
+                Collections.sort(filteredList, new Comparator<Transaction>() {
+                    @Override
+                    public int compare(Transaction t1, Transaction t2) {
+                        return Double.compare(t1.getAmount(), t2.getAmount());
+                    }
+                });
+                break;
+        }
+        adapter.updateTransactions(filteredList);
     }
 
     private void setupSwipeToDelete() {
@@ -152,7 +211,6 @@ public class IncomeFragment extends Fragment implements TransactionAdapter.OnTra
                 int position = viewHolder.getAdapterPosition();
                 Transaction transaction = filteredList.get(position);
 
-                // Show confirmation dialog
                 new AlertDialog.Builder(getContext())
                         .setTitle("Delete Income")
                         .setMessage("Are you sure you want to delete this income?")
@@ -201,7 +259,7 @@ public class IncomeFragment extends Fragment implements TransactionAdapter.OnTra
             }
         }
 
-        adapter.updateTransactions(filteredList);
+        sortTransactions();
         updateEmptyState();
     }
 
@@ -236,19 +294,16 @@ public class IncomeFragment extends Fragment implements TransactionAdapter.OnTra
         Spinner categorySpinner = dialogView.findViewById(R.id.categorySpinner);
         EditText descriptionInput = dialogView.findViewById(R.id.descriptionInput);
 
-        // Setup category spinner
         List<String> categories = databaseHelper.getCategories(userEmail, "income");
         ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_item, categories);
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(categoryAdapter);
 
-        // Setup date picker
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
 
         if (transaction != null) {
-            // Edit mode
             amountInput.setText(String.valueOf(transaction.getAmount()));
             calendar.setTimeInMillis(transaction.getDate());
             dateInput.setText(dateFormat.format(calendar.getTime()));
@@ -301,7 +356,7 @@ public class IncomeFragment extends Fragment implements TransactionAdapter.OnTra
                         transaction == null ? "Income added" : "Income updated",
                         Toast.LENGTH_SHORT).show();
                 loadIncome();
-                setupFilterChips(); // Refresh chips in case new category was added
+                setupFilterChips();
             } else {
                 Toast.makeText(getContext(), "Operation failed", Toast.LENGTH_SHORT).show();
             }

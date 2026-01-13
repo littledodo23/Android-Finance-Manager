@@ -28,6 +28,8 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -41,6 +43,7 @@ public class ExpensesFragment extends Fragment implements TransactionAdapter.OnT
     private TextView totalExpensesText, transactionCountText, budgetWarningText;
     private LinearLayout emptyStateLayout;
     private Button emptyStateAddButton;
+    private Spinner sortSpinner;
     private TransactionAdapter adapter;
 
     private DatabaseHelper databaseHelper;
@@ -48,6 +51,7 @@ public class ExpensesFragment extends Fragment implements TransactionAdapter.OnT
     private List<Transaction> expensesList;
     private List<Transaction> filteredList;
     private String selectedCategory = "All";
+    private int selectedSortOption = 0; // 0: Newest First, 1: Oldest First, 2: Highest Amount, 3: Lowest Amount
 
     @Nullable
     @Override
@@ -59,19 +63,19 @@ public class ExpensesFragment extends Fragment implements TransactionAdapter.OnT
             userEmail = getArguments().getString("userEmail");
         }
 
-        databaseHelper = new DatabaseHelper(getContext());
+        databaseHelper = DatabaseHelper.getInstance(requireContext());
+
+
 
         initializeViews(view);
         setupRecyclerView();
         setupSearchView();
         setupFilterChips();
+        setupSortSpinner();
         setupSwipeToDelete();
         loadExpenses();
 
-        // FAB button click
         addExpenseFab.setOnClickListener(v -> showAddExpenseDialog(null));
-
-        // Empty state button click
         emptyStateAddButton.setOnClickListener(v -> showAddExpenseDialog(null));
 
         return view;
@@ -88,6 +92,7 @@ public class ExpensesFragment extends Fragment implements TransactionAdapter.OnT
         budgetWarningText = view.findViewById(R.id.budgetWarningText);
         emptyStateLayout = view.findViewById(R.id.emptyStateLayout);
         emptyStateAddButton = view.findViewById(R.id.emptyStateAddButton);
+        sortSpinner = view.findViewById(R.id.sortSpinner);
     }
 
     private void setupRecyclerView() {
@@ -116,7 +121,6 @@ public class ExpensesFragment extends Fragment implements TransactionAdapter.OnT
     private void setupFilterChips() {
         filterChipGroup.removeAllViews();
 
-        // Add "All" chip
         Chip allChip = new Chip(getContext());
         allChip.setText("All");
         allChip.setCheckable(true);
@@ -127,7 +131,6 @@ public class ExpensesFragment extends Fragment implements TransactionAdapter.OnT
         });
         filterChipGroup.addView(allChip);
 
-        // Add category chips
         List<String> categories = databaseHelper.getCategories(userEmail, "expense");
         for (String category : categories) {
             Chip chip = new Chip(getContext());
@@ -139,6 +142,63 @@ public class ExpensesFragment extends Fragment implements TransactionAdapter.OnT
             });
             filterChipGroup.addView(chip);
         }
+    }
+
+    private void setupSortSpinner() {
+        String[] sortOptions = {"Newest First", "Oldest First", "Highest Amount", "Lowest Amount"};
+        ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, sortOptions);
+        sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sortSpinner.setAdapter(sortAdapter);
+
+        sortSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                selectedSortOption = position;
+                sortTransactions();
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+        });
+    }
+
+    private void sortTransactions() {
+        switch (selectedSortOption) {
+            case 0: // Newest First
+                Collections.sort(filteredList, new Comparator<Transaction>() {
+                    @Override
+                    public int compare(Transaction t1, Transaction t2) {
+                        return Long.compare(t2.getDate(), t1.getDate());
+                    }
+                });
+                break;
+            case 1: // Oldest First
+                Collections.sort(filteredList, new Comparator<Transaction>() {
+                    @Override
+                    public int compare(Transaction t1, Transaction t2) {
+                        return Long.compare(t1.getDate(), t2.getDate());
+                    }
+                });
+                break;
+            case 2: // Highest Amount
+                Collections.sort(filteredList, new Comparator<Transaction>() {
+                    @Override
+                    public int compare(Transaction t1, Transaction t2) {
+                        return Double.compare(t2.getAmount(), t1.getAmount());
+                    }
+                });
+                break;
+            case 3: // Lowest Amount
+                Collections.sort(filteredList, new Comparator<Transaction>() {
+                    @Override
+                    public int compare(Transaction t1, Transaction t2) {
+                        return Double.compare(t1.getAmount(), t2.getAmount());
+                    }
+                });
+                break;
+        }
+        adapter.updateTransactions(filteredList);
     }
 
     private void setupSwipeToDelete() {
@@ -153,7 +213,6 @@ public class ExpensesFragment extends Fragment implements TransactionAdapter.OnT
                 int position = viewHolder.getAdapterPosition();
                 Transaction transaction = filteredList.get(position);
 
-                // Show confirmation dialog
                 new AlertDialog.Builder(getContext())
                         .setTitle("Delete Expense")
                         .setMessage("Are you sure you want to delete this expense?")
@@ -203,7 +262,7 @@ public class ExpensesFragment extends Fragment implements TransactionAdapter.OnT
             }
         }
 
-        adapter.updateTransactions(filteredList);
+        sortTransactions();
         updateEmptyState();
     }
 
@@ -265,19 +324,16 @@ public class ExpensesFragment extends Fragment implements TransactionAdapter.OnT
         Spinner categorySpinner = dialogView.findViewById(R.id.categorySpinner);
         EditText descriptionInput = dialogView.findViewById(R.id.descriptionInput);
 
-        // Setup category spinner
         List<String> categories = databaseHelper.getCategories(userEmail, "expense");
         ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_item, categories);
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(categoryAdapter);
 
-        // Setup date picker
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
 
         if (transaction != null) {
-            // Edit mode
             amountInput.setText(String.valueOf(transaction.getAmount()));
             calendar.setTimeInMillis(transaction.getDate());
             dateInput.setText(dateFormat.format(calendar.getTime()));
@@ -330,11 +386,9 @@ public class ExpensesFragment extends Fragment implements TransactionAdapter.OnT
                         transaction == null ? "Expense added" : "Expense updated",
                         Toast.LENGTH_SHORT).show();
 
-                // Check budget and show alert if exceeded
                 checkBudgetAlert(category, date);
-
                 loadExpenses();
-                setupFilterChips(); // Refresh chips
+                setupFilterChips();
             } else {
                 Toast.makeText(getContext(), "Operation failed", Toast.LENGTH_SHORT).show();
             }

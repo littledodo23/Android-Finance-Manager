@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -54,7 +55,8 @@ public class HomeFragment extends Fragment {
             userEmail = getArguments().getString("userEmail");
         }
 
-        databaseHelper = new DatabaseHelper(requireContext());
+        databaseHelper = DatabaseHelper.getInstance(requireContext());
+
 
         initializeViews(view);
         setupPeriodSpinner();
@@ -83,8 +85,40 @@ public class HomeFragment extends Fragment {
 
     private void setupPeriodSpinner() {
         String[] periods = {"This Month", "Last Month", "Last 3 Months", "Last 6 Months", "This Year"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_spinner_item, periods);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(requireContext(),
+                android.R.layout.simple_spinner_item, periods) {
+
+            @NonNull
+            @Override
+            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView textView = (TextView) view;
+
+                // Set text color based on theme
+                int textColor = ContextCompat.getColor(requireContext(), R.color.spinner_text);
+                textView.setTextColor(textColor);
+
+                return view;
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView textView = (TextView) view;
+
+                // Set dropdown text and background colors based on theme
+                int textColor = ContextCompat.getColor(requireContext(), R.color.text_dark);
+                int backgroundColor = ContextCompat.getColor(requireContext(), R.color.card_white);
+
+                textView.setTextColor(textColor);
+                textView.setBackgroundColor(backgroundColor);
+                textView.setPadding(32, 32, 32, 32);
+
+                return view;
+            }
+        };
+
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         periodSpinner.setAdapter(adapter);
     }

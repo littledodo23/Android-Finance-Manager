@@ -33,9 +33,10 @@ public class ProfileFragment extends Fragment {
         if (getArguments() != null) {
             userEmail = getArguments().getString("userEmail");
         }
-        
-        databaseHelper = new DatabaseHelper(getContext());
-        
+
+        databaseHelper = DatabaseHelper.getInstance(requireContext());
+
+
         initializeViews(view);
         loadUserProfile();
         
